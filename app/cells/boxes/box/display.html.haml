@@ -1,0 +1,27 @@
+= box_div do
+
+  - boxes_configuration_block do
+    %h3.box_name= box_name
+  
+  - if not @widget.blank?
+    - boxes_configuration_block do
+      %h3.widget_name= @widget.name
+    = rendered_children[@widget.name]
+  - else
+    - boxes_configuration_block do
+      %p.empty No widget
+
+  - if @cell.children.reject{|w|w == @widget}.size > 0
+    = @cell.children.collect{|child| rendered_children[child.name] if ((child != @cell) && (child != @widget))}.join.html_safe
+  - else
+    - boxes_configuration_block do
+      %p.empty No nested boxes
+  
+  - boxes_configuration_block do
+    %p.box_tools
+      = link_to "Configure", url_for_event(:configure), :class => 'ajax'
+      |
+      = link_to_remove_box 
+      %br
+      = link_to_add_sibling_box
+      

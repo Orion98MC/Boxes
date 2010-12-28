@@ -1,0 +1,114 @@
+Boxes for Rails
+===============
+“You box them, then you shape them !”
+
+
+This plugin helps you transform an existing Ruby on Rails application with existing models etc... into an easy to customize CMS with Apotomo widgets.
+This is a Pre-alpha release in heavy development. Be sure to checkout the latest version.
+
+Principles
+----------
+Boxes uses Apotomo's widgets framework.
+With Boxes you concentrate on making greate re-usable widgets and let boxes manage the widgets layout/hierarchy/configuration.
+
+Boxes manages a hierarchy of Box widgets per ActionController action, it also manages there layout and there event responses.
+Each Box can contain one Widget (an Apotomo widget)
+Each Box can also contain other nested boxes.
+
+a Box itself is an Apotomo stateless widget.
+It has two states:
+  * in the default state (:display), it displays a widget (the attached Apotomo widget) and the nested Boxes (if any)
+  * in the :configure state, it displays a form with all the box-meta parameters to configure the box behavior.
+
+Roadmap:
+	* Dynamic widget tree creation based on controller#action (ALREADY DONE)
+	* Visual widget tree creation (ALREADY DONE)
+	* Visual configuration of widgets and layout (PARTIALY DONE)
+	* Visual event response routing (TODO)
+	
+	
+How do I use Boxes, gimme code !
+--------------------------------
+
+After installation (see below), it's that easy:
+
+class DashboardController < ApplicationController
+  include Apotomo::Rails::ControllerMethods
+  
+  has_boxes :except => :foo
+  
+  def home
+  end
+
+  def admin
+  end
+
+  def contact
+  end
+
+  def foo
+  end
+
+end
+
+In the app/views/dashboard/home.html.haml view:
+
+%h1 Dashboard#home
+%div.boxes
+  = render_boxes
+  = link_to_add_sibling_box "Add a box"
+
+In the application layout view (or the dashboard layout view), we must add a javascript to trigger unobstrusive ajax calls:
+Boxes add a css class 'ajax' to every ajax links and forms, you may add this in a javascript file or inline on the layout.
+Example using jQuery:
+jQuery(function(){
+  jQuery('a.ajax, input.ajax, div.pagination>a').live("click", function() { jQuery.get(this.href, null, null, "script");return false; });
+  jQuery("form.ajax").live("submit", function() {
+    form = jQuery(this);
+    jQuery.ajax({url: form.attr("data-event-url"), data: form.serialize()});
+    return false;
+  });
+});
+
+
+Install:
+--------
+
+Pre-requisits: "apotomo" gem
+then,
+$ rails plugin install <Boxes-on-GitHub-repository>
+
+
+Meta model:
+-----------
+
+Create a migration like this:
+
+class CreateMetaBoxes < ActiveRecord::Migration
+  def self.up
+    create_table :meta_boxes do |t|
+      t.string :address, :null => false
+      t.integer :parent_id
+      t.boolean :published, :default => true
+      t.text :html_options
+      t.string :wclass
+      t.text :wparams
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :meta_boxes
+  end
+end
+
+TODO: make a rails generator! (of course)
+
+Then run the migration:
+$ rake db:migrate
+
+You can change the meta-model table name but be sure to keep the attributes listed above.
+You may also add attributes to your meta-model.
+(TODO example of custom meta-model)
+
