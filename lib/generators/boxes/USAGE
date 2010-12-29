@@ -1,0 +1,9 @@
+Description:
+    Generate a Meta model migration for Boxes
+
+Example:
+    rails generate boxes:meta 
+
+    This will create:
+        A migration file to create a meta_box table
+				

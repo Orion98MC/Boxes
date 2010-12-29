@@ -1,3 +1,4 @@
+require 'boxes/view_helpers'
 require 'boxes/core'
 require 'boxes/box'
 require 'boxes/controller'

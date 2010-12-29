@@ -1,2 +1,0 @@
-require "apotomo"
-require "boxes"

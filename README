@@ -60,9 +60,10 @@ In the app/views/dashboard/home.html.haml view:
 
 In the application layout view (or the dashboard layout view), we must add a javascript to trigger unobstrusive ajax calls:
 Boxes add a css class 'ajax' to every ajax links and forms, you may add this in a javascript file or inline on the layout.
+
 Example using jQuery:
 jQuery(function(){
-  jQuery('a.ajax, input.ajax, div.pagination>a').live("click", function() { jQuery.get(this.href, null, null, "script");return false; });
+  jQuery('a.ajax').live("click", function() { jQuery.get(this.href, null, null, "script");return false; });
   jQuery("form.ajax").live("submit", function() {
     form = jQuery(this);
     jQuery.ajax({url: form.attr("data-event-url"), data: form.serialize()});
@@ -82,36 +83,12 @@ $ rails plugin install <Boxes-on-GitHub-repository>
 Meta model:
 -----------
 
-Create a migration like this:
-
-class CreateMetaBoxes < ActiveRecord::Migration
-  def self.up
-    create_table :meta_boxes do |t|
-      t.string :address, :null => false
-      t.integer :parent_id
-      t.integer :position
-      t.boolean :published, :default => true
-      t.text :html_options
-      t.string :wclass
-      t.string :wname
-      t.string :wstate
-      t.text :wopts
-
-      t.timestamps
-    end
-  end
-
-  def self.down
-    drop_table :meta_boxes
-  end
-end
-
-TODO: make a rails generator! (of course)
+Let's create the meta model migration:
+$ rails g boxes:migration
 
 Then run the migration:
 $ rake db:migrate
 
-You can change the meta-model table name but be sure to keep the attributes listed above.
-You may also add attributes to your meta-model.
+You can change the meta-model table name, add attributes of your own but don't mess with the generated attributes.
 (TODO example of custom meta-model)
 
