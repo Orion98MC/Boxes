@@ -1,26 +1,44 @@
 = form_tag "", "data-event-url" => url_for_event(:save), :class => "ajax" do 
   = hidden_field_tag "meta_id", @cell.meta.id
+
+  %div.form_item
+    - if not Boxes.widgets_class_names.blank?
+      = label_tag 'Widget class'  
+      = select_tag "meta[wclass]", options_for_select([["select one...", nil]] + Boxes.widgets_class_names, @cell.meta.wclass), :id => "#{@cell.name}-wclass", :rel => url_for_event(:update_configure)
+    - else
+      = label_tag "", 'Widget class (String)'
+      = text_field_tag "meta[wclass]", @cell.meta.wclass
+
   %div.form_item
     = label_tag "", 'HTML options (JSON Hash)'
     = text_field_tag "meta[html_options]", @cell.meta.html_options.blank? ? nil: @cell.meta.html_options.to_json
+
   %div.form_item
     = label_tag 'Published'
     = @cell.meta.published? ? "Yes" : "No"
 
   %div.form_item
-    
-    - if not Boxes.widgets_class_names.blank?
-      = label_tag 'Widget class'  
-      = select_tag "meta[wclass]", options_for_select([["select one...", nil]] + Boxes.widgets_class_names, @cell.meta.wclass)
-    - else
-      = label_tag "", 'Widget class (String)'
-      = text_field_tag "meta[wclass]", @cell.meta.wclass
-  
+    = label_tag "", 'Instance name'
+    = text_field_tag "meta[wname]", @cell.meta.wname
+
   %div.form_item
-    = label_tag "", 'Widget params (JSON)'
-    = text_field_tag "meta[wparams]", @cell.meta.wparams.blank? ? nil: @cell.meta.wparams.to_json
+    = label_tag "", 'Start state'
+    = text_field_tag "meta[wstate]", @cell.meta.wstate
+
+  - if @configurable
+    = rendered_children[@widget.name]
+  - else
+    %div.form_item
+      = label_tag "", 'Options (JSON Hash)'
+      = text_field_tag "meta[wopts]", @cell.meta.wopts.blank? ? nil: @cell.meta.wopts.to_json
   
   %div.form_actions
     = submit_tag "Update"
     |
     = link_to "Cancel", url_for_event(:display), :class => "ajax"
+    
+- if not @should_suppress_js
+  :javascript
+    jQuery("##{@cell.name}-wclass").live("change", function(){
+      jQuery.get(jQuery(this).attr("rel") + "&wclass="+ this.value, null, null, "script");return false;
+    });

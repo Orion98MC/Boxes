@@ -74,7 +74,7 @@ jQuery(function(){
 Install:
 --------
 
-Pre-requisits: "apotomo" gem
+Pre-requisits: "apotomo" gem, "acts_as_list" gem
 then,
 $ rails plugin install <Boxes-on-GitHub-repository>
 
@@ -89,10 +89,13 @@ class CreateMetaBoxes < ActiveRecord::Migration
     create_table :meta_boxes do |t|
       t.string :address, :null => false
       t.integer :parent_id
+      t.integer :position
       t.boolean :published, :default => true
       t.text :html_options
       t.string :wclass
-      t.text :wparams
+      t.string :wname
+      t.string :wstate
+      t.text :wopts
 
       t.timestamps
     end
