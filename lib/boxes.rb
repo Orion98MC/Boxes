@@ -7,4 +7,5 @@ module Boxes
 end
 
 ActionController::Base.extend(Boxes::Controller::ClassMethods)
+ActionController::Base.send(:include, Boxes::Controller::InstanceMethods)
 ActionView::Base.send(:include, Boxes::ViewHelpers)

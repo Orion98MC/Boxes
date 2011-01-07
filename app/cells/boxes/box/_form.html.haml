@@ -1,29 +1,31 @@
 = form_tag "", "data-event-url" => url_for_event(:save), :class => "ajax" do 
   = hidden_field_tag "meta_id", @cell.meta.id
 
-  %div.form_item
-    - if not Boxes.widgets_class_names.blank?
-      = label_tag 'Widget class'  
-      = select_tag "meta[wclass]", options_for_select([["select one...", nil]] + Boxes.widgets_class_names, @cell.meta.wclass), :id => "#{@cell.name}-wclass", :rel => url_for_event(:update_configure)
-    - else
-      = label_tag "", 'Widget class (String)'
-      = text_field_tag "meta[wclass]", @cell.meta.wclass
+  %div.general
+    %div.form_item
+      - if not Boxes.widgets_class_names.blank?
+        = label_tag 'Widget class'  
+        = select_tag "meta[wclass]", options_for_select([["select one...", nil]] + Boxes.widgets_class_names, @cell.meta.wclass), :id => "#{@cell.name}-wclass", :rel => url_for_event(:update_configure)
+      - else
+        = label_tag "", 'Widget class (String)'
+        = text_field_tag "meta[wclass]", @cell.meta.wclass
 
-  %div.form_item
-    = label_tag "", 'HTML options (JSON Hash)'
-    = text_field_tag "meta[html_options]", @cell.meta.html_options.blank? ? nil: @cell.meta.html_options.to_json
+    %div.form_item
+      = label_tag "", 'HTML options (JSON Hash)'
+      = text_field_tag "meta[html_options]", @cell.meta.html_options.blank? ? nil: @cell.meta.html_options.to_json
 
-  %div.form_item
-    = label_tag 'Published'
-    = @cell.meta.published? ? "Yes" : "No"
+      = hidden_field_tag "meta[published]", false
+    %div.form_item
+      = label_tag 'Published'
+      = check_box_tag "meta[published]", true, @cell.meta.published?
 
-  %div.form_item
-    = label_tag "", 'Instance name'
-    = text_field_tag "meta[wname]", @cell.meta.wname
+    %div.form_item
+      = label_tag "", 'Instance name'
+      = text_field_tag "meta[wname]", @cell.meta.wname
 
-  %div.form_item
-    = label_tag "", 'Start state'
-    = text_field_tag "meta[wstate]", @cell.meta.wstate
+    %div.form_item
+      = label_tag "", 'Start state'
+      = text_field_tag "meta[wstate]", @cell.meta.wstate
 
   - if @configurable
     = rendered_children[@widget.name]
@@ -37,8 +39,8 @@
     |
     = link_to "Cancel", url_for_event(:display), :class => "ajax"
     
-- if not @should_suppress_js
   :javascript
+    jQuery("##{@cell.name}-wclass").die("change");
     jQuery("##{@cell.name}-wclass").live("change", function(){
       jQuery.get(jQuery(this).attr("rel") + "&wclass="+ this.value, null, null, "script");return false;
     });

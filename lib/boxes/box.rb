@@ -23,10 +23,10 @@ module Boxes
   	def display
       render
   	end
+  	
 
     responds_to_event :configure, :with => :configure
   	def configure
-  	  @should_suppress_js ||= false
   	  c = meta.configure_widget(parent_controller)
   	  if not c.nil?
   	    @configurable = true
@@ -38,7 +38,6 @@ module Boxes
   	responds_to_event :update_configure, :with => :update_configure
   	def update_configure
   	  meta.wclass = param(:wclass) if param(:wclass)
-  	  @should_suppress_js = true
   	  render :state => :configure
 	  end
   	  	
@@ -48,11 +47,22 @@ module Boxes
   		meta = Boxes.meta_model.find(param(:meta_id))
   		::Rails.logger.debug "MetaBox: #{meta}"
   		unless meta.blank?
+  		  published = meta.published?
+  		  
         if meta.update_attributes(param(:meta))
   		    self.meta = meta
   		    self.meta.configurable = configurable
+  		    # The widget tree is already built so ...
+  		    if not self.meta.published?
+  		      # remove children
+    		    self.children.reject{|w|w == @widget}.each{|w|w.removeFromParent!} 
+    		    @widget.removeFromParent! if not @widget.blank?
+  		    else
+  		      # we should add the children by hand
+  		      Boxes::Core.build_boxes_tree(self, parent_controller, Boxes.meta_model.at_address(session[:boxes_address]), self) if not published
+		      end
 		    end
-        reset_widget(meta.widget(parent_controller))
+        reset_widget(meta.published? ? meta.widget(parent_controller) : nil)
 		  end
   		replace :state => :display
   	end

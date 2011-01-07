@@ -39,16 +39,37 @@ module Boxes
               session[:boxes_address] = "#{controller_name}##{action_name}" if not action_name.match(/#{apotomo_event_path(:controller => controller_name).split('/').last}/)
               return if session[:boxes_address].blank? # safe guard, in case of a server restart and the client trying to connect with an ajax call
           
+              # Set the @_boxes ivar (used to store stylesheets/javascripts to include)
+              self.instance_variable_set("@_boxes_content", {:stylesheets => [], :javascripts => []})
+              
               # build widget tree for the address
               Boxes::Core.build_boxes_tree(root, self, Boxes.meta_model.at_address(session[:boxes_address]))
             else
               session[:boxes_address] = nil
             end
             
-          end
+          end 
           
-        end
+        end # has_widgets
+      end # has_boxes
+      
+    end
+    
+    module InstanceMethods
+      # returns the current recorded boxes address
+      def boxes_address
+        session[:boxes_address]
       end
+      
+      def boxes_javascripts
+        @_boxes_content[:javascripts]
+      end
+      
+      def boxes_stylesheets
+        @_boxes_content[:stylesheets]
+      end
+      
+      
     end
         
     module Actions

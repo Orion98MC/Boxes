@@ -2,8 +2,10 @@ module Boxes
   module ViewHelpers
     
     def box_div(options={:class => 'box'}, &block)
-      html_options = @cell.meta.html_options.blank? ? options : options.merge(@cell.meta.html_options)
-      widget_div(html_options, &block)
+      options[:class] = options[:class] + " configurable" if @cell.meta.configurable?
+      html_options = @cell.meta.html_options if @cell.meta.html_options.is_a?(Hash)
+      options.merge!(html_options || {})
+      widget_div(options, &block)
     end
         
     def box_name
@@ -30,13 +32,30 @@ module Boxes
     def render_boxes
       content = []
       controller.apotomo_root.children.each do |widget|
-        content << render_widget(widget)
+        content << render_widget(widget) if widget.is_a?(Boxes::Box)
       end
       content.join.html_safe
     end
     
+    #
+    def boxes_javascript_include_tag
+      boxes_content = controller.instance_variable_get("@_boxes_content") || {}
+      js = boxes_content[:javascripts] || []
+      (js.flatten.uniq||[]).collect{|js| javascript_include_tag(js)}.join("\n").html_safe
+    end
+
+    #
+    def boxes_stylesheet_link_tag
+      boxes_content = controller.instance_variable_get("@_boxes_content") || {}
+      st = boxes_content[:stylesheets] || []
+      # by default we include the boxes.css 
+      st << "boxes" 
+      (st.flatten.uniq||[]).collect{|st| stylesheet_link_tag(st)}.join("\n").html_safe
+    end
+    
     # Add a brother box link
     def link_to_add_sibling_box(name="Add a box", options={})
+      return if not Boxes.allows_creation?
       if defined? @cell
         if @cell.is_a? Boxes::Box
           # TODO: implement a Boxes::Box method to handle it in ajax

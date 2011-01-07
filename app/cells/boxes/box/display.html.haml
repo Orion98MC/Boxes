@@ -1,27 +1,28 @@
 = box_div do
 
   - boxes_configuration_block do
-    %h3.box_name= box_name
-  
+    %h3.box_name= "#{box_name} (#{@widget.blank? ? 'No widget' : @widget.name})"
+    - if not @cell.meta.published?
+      %span.published Not published
+    - if not @cell.meta.widget_errors.blank?
+      %div.errors
+        %ul.errors
+          - @cell.meta.widget_errors.each do |k, message|
+            %li= message
+          
   - if not @widget.blank?
-    - boxes_configuration_block do
-      %h3.widget_name= @widget.name
     = rendered_children[@widget.name]
-  - else
-    - boxes_configuration_block do
-      %p.empty No widget
 
-  - if @cell.children.reject{|w|w == @widget}.size > 0
-    = @cell.children.collect{|child| rendered_children[child.name] if ((child != @cell) && (child != @widget))}.join.html_safe
-  - else
-    - boxes_configuration_block do
-      %p.empty No nested boxes
+  - children = @cell.children.reject{|w|w == @widget}
+  - if children.size > 0
+    = children.collect{|child| rendered_children[child.name]}.join.html_safe
   
   - boxes_configuration_block do
     %p.box_tools
       = link_to "Configure", url_for_event(:configure), :class => 'ajax'
       |
       = link_to_remove_box 
-      %br
-      = link_to_add_sibling_box
+      - if @cell.meta.published? && Boxes.allows_creation?
+        |
+        = link_to_add_sibling_box
       
