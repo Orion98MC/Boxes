@@ -75,7 +75,7 @@ jQuery(function(){
 Install:
 --------
 
-Pre-requisits: "apotomo" gem, "acts_as_list" gem
+Pre-requisits: "apotomo" gem, "acts_as_list" gem, "haml" gem and jQuery
 then,
 $ rails plugin install <Boxes-on-GitHub-repository>
 
@@ -92,3 +92,8 @@ $ rake db:migrate
 You can change the meta-model table name, add attributes of your own but don't mess with the generated attributes.
 (TODO example of custom meta-model)
 
+
+Screen cast demo:
+-----------------
+
+http://www.youtube.com/watch?v=pXEz5DJx_ho
