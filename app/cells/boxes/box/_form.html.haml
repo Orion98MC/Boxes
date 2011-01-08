@@ -3,12 +3,11 @@
 
   %div.general
     %div.form_item
-      - if not Boxes.widgets_class_names.blank?
-        = label_tag 'Widget class'  
-        = select_tag "meta[wclass]", options_for_select([["select one...", nil]] + Boxes.widgets_class_names, @cell.meta.wclass), :id => "#{@cell.name}-wclass", :rel => url_for_event(:update_configure)
-      - else
-        = label_tag "", 'Widget class (String)'
-        = text_field_tag "meta[wclass]", @cell.meta.wclass
+      = label_tag 'Registered widgets'
+      = select_tag "meta[wclass]", options_for_select([["select one...", nil]] + (Boxes.widgets_class_names || []), @cell.meta.wclass), :id => "#{@cell.name}-wclass", :rel => url_for_event(:update_configure)
+    %div.form_item
+      = label_tag 'Widget class (String)'
+      = text_field_tag "meta[wclass]", @cell.meta.wclass
 
     %div.form_item
       = label_tag "", 'HTML options (JSON Hash)'
